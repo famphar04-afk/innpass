@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>InnPass · Tu medicación en DCI</title>
+  <meta name="description" content="Traduce la marca de tu medicamento a su nombre internacional (DCI/INN) y enséñaselo al farmacéutico en cualquier país.">
+  <meta name="theme-color" content="#0b1f17">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="InnPass">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       PANTALLA 1 · Inicio (paciente)
+       ============================================================ -->
+  <main id="view-home" class="view" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">InnPass</span>
+      </div>
+      <p class="tagline">Tu medicación en nombre internacional (DCI · OMS)</p>
+    </header>
+
+    <section class="search" aria-label="Buscar medicamento">
+      <label class="sr-only" for="search-input">Marca o principio activo</label>
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search-input" type="search" inputmode="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               placeholder="Marca o DCI: Norvasc, amlodipino, Gelocatil…" aria-autocomplete="list" aria-controls="search-results" aria-expanded="false">
+        <button id="search-clear" class="icon-btn" type="button" aria-label="Borrar búsqueda" hidden>×</button>
+      </div>
+      <ul id="search-results" class="results" role="listbox" hidden></ul>
+      <p id="search-empty" class="hint" hidden>No está en el catálogo del piloto (40 fármacos). Prueba con el principio activo de la caja.</p>
+    </section>
+
+    <section class="treatment" aria-labelledby="treatment-title">
+      <div class="section-head">
+        <h2 id="treatment-title">Tu tratamiento</h2>
+        <span id="treatment-count" class="count" hidden></span>
+      </div>
+      <ul id="treatment-list" class="med-list"></ul>
+      <div id="treatment-empty" class="empty">
+        <p><strong>Aún no hay nada.</strong></p>
+        <p>Busca la marca que pone en tu caja o el principio activo y añádelo al pase.</p>
+      </div>
+    </section>
+
+    <p class="privacy">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      Se guarda solo en este móvil. No hay cuenta ni servidor.
+    </p>
+
+    <div class="cta-bar">
+      <button id="btn-show-pass" class="btn btn-primary" type="button" disabled>Mostrar pase</button>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       PANTALLA 2 · Ficha del fármaco
+       ============================================================ -->
+  <main id="view-drug" class="view" hidden>
+    <header class="topbar topbar-nav">
+      <button id="btn-drug-back" class="back-btn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg> Buscar
+      </button>
+    </header>
+
+    <section class="drug-head">
+      <p class="label">DCI · Denominación Común Internacional</p>
+      <h1 id="drug-inn-es" class="drug-title">—</h1>
+      <p class="drug-inn"><span id="drug-inn">—</span> <span class="muted">· OMS/INN</span></p>
+      <p id="drug-atc" class="atc muted"></p>
+    </section>
+
+    <div id="drug-alerts" class="alerts" hidden></div>
+
+    <section class="chooser">
+      <h2 class="chooser-title">Dosis</h2>
+      <div id="drug-doses" class="pills" role="radiogroup" aria-label="Dosis"></div>
+    </section>
+
+    <section class="chooser">
+      <h2 class="chooser-title">Forma</h2>
+      <div id="drug-forms" class="pills" role="radiogroup" aria-label="Forma farmacéutica"></div>
+    </section>
+
+    <p id="drug-brands-es" class="brands-help muted"></p>
+
+    <div class="cta-bar">
+      <p id="drug-cta-hint" class="cta-hint" hidden>Elige la dosis de tu caja</p>
+      <button id="btn-add" class="btn btn-primary" type="button" disabled>Añadir al pase</button>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       PANTALLA 3 · Pase / vista farmacéutico
+       ============================================================ -->
+  <main id="view-pass" class="view view-pass" hidden>
+    <div class="pass-toolbar">
+      <button id="btn-pass-back" class="back-btn" type="button" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg> Editar
+      </button>
+      <span class="pass-toolbar-spacer"></span>
+      <label class="country">
+        <span>Marcas en</span>
+        <select id="country-select" aria-label="País para mostrar marcas comerciales"></select>
+      </label>
+    </div>
+
+    <article class="pass-card" aria-label="Pase de medicación en DCI">
+      <header class="pass-head">
+        <div>
+          <p class="pass-kicker">InnPass · Medicación del viajero</p>
+          <h1 class="pass-title">Nombre internacional (DCI / INN)</h1>
+        </div>
+        <span class="pass-who" aria-hidden="true">OMS<br>WHO</span>
+      </header>
+
+      <ol id="pass-list" class="pass-list"></ol>
+      <p id="pass-empty" class="pass-empty" hidden>Este pase está vacío o el enlace no es válido.</p>
+
+      <div class="pass-tear" aria-hidden="true"></div>
+
+      <section class="pass-qr">
+        <div id="qr" class="qr" role="img" aria-label="Código QR con el enlace de este pase"></div>
+        <p class="qr-caption">Escanea para abrir este mismo pase</p>
+      </section>
+
+      <footer class="pass-foot">
+        <p class="pass-foot-main">Comunicación DCI, no equivalencia automática.</p>
+        <p class="pass-foot-sub">Communication aid only · not a prescription · the pharmacist must confirm the product.</p>
+      </footer>
+    </article>
+
+    <div class="pass-actions">
+      <button id="btn-copy" class="btn btn-primary" type="button">Copiar enlace</button>
+      <div class="pass-actions-row">
+        <button id="btn-install" class="btn btn-ghost" type="button">Añadir a inicio</button>
+        <a class="btn btn-ghost btn-wallet" href="https://walletwallet.alen.ro" target="_blank" rel="noopener noreferrer">
+          Añadir a Wallet <span class="badge">fase 2</span>
+        </a>
+      </div>
+      <button id="btn-pass-own" class="link-btn" type="button" hidden>¿Eres el paciente? Crea tu propio pase</button>
+    </div>
+  </main>
+
+  <!-- Estado de carga / error del catálogo -->
+  <div id="boot" class="boot">
+    <p>Cargando catálogo…</p>
+  </div>
+
+  <!-- Diálogo: instrucciones "Añadir a inicio" -->
+  <dialog id="install-dialog" class="dialog">
+    <h2>Añadir InnPass a la pantalla de inicio</h2>
+    <div id="install-steps"></div>
+    <p class="muted small">Así se abre como una app y funciona sin conexión una vez cargada.</p>
+    <button id="install-close" class="btn btn-primary" type="button">Entendido</button>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="./vendor/qrcode.js" defer></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>

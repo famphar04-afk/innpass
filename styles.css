@@ -1,0 +1,354 @@
+/* ==========================================================================
+   InnPass · estilos
+   Editor (paciente): oscuro #0b1f17 + acento lima #d8f56a
+   Pase (farmacéutico): tarjeta clara, texto oscuro, DCI 28–34px
+   Móvil-first. Se usa de pie, a 40 cm.
+   ========================================================================== */
+
+:root {
+  --bg: #0b1f17;
+  --bg-2: #12291f;
+  --bg-3: #1a3529;
+  --line: rgba(255, 255, 255, 0.10);
+  --fg: #f2f7f0;
+  --fg-muted: #9fb3a6;
+  --accent: #d8f56a;
+  --accent-ink: #0b1f17;
+  --danger: #ff8a80;
+  --warn-bg: #fff3c4;
+  --warn-ink: #5a3d00;
+  --warn-line: #e6b800;
+
+  --card-bg: #fbfcf6;
+  --card-ink: #0b1f17;
+  --card-muted: #4f5f56;
+  --card-line: #d7ddd3;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --tap: 48px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.35;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body { min-height: 100dvh; }
+
+h1, h2, h3, p { margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.muted { color: var(--fg-muted); }
+.small { font-size: 0.85rem; }
+
+/* --------------------------------------------------------------------------
+   Vistas
+   -------------------------------------------------------------------------- */
+.view {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: calc(16px + var(--safe-t)) 16px calc(110px + var(--safe-b));
+  min-height: 100dvh;
+}
+
+.topbar { padding: 8px 0 16px; }
+.topbar-nav { padding: 0 0 8px; margin-left: -8px; }
+
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark {
+  width: 26px; height: 26px; border-radius: 8px;
+  background: var(--accent);
+  position: relative;
+}
+.brand-mark::after {
+  content: ""; position: absolute; inset: 7px 5px;
+  border-radius: 999px; background: var(--accent-ink);
+  transform: rotate(-35deg);
+}
+.brand-name { font-weight: 800; font-size: 1.35rem; letter-spacing: -0.01em; }
+.tagline { color: var(--fg-muted); margin-top: 6px; font-size: 0.95rem; }
+
+.back-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: none; border: 0; padding: 10px 8px;
+  color: var(--accent); font-weight: 600; min-height: var(--tap);
+}
+.back-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --------------------------------------------------------------------------
+   Buscador + autocomplete
+   -------------------------------------------------------------------------- */
+.search { position: relative; }
+
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-2);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0 8px 0 14px;
+  min-height: 56px;
+}
+.search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(216, 245, 106, 0.18); }
+.search-icon { width: 22px; height: 22px; flex: none; fill: none; stroke: var(--fg-muted); stroke-width: 2; stroke-linecap: round; }
+.search-box input {
+  flex: 1; min-width: 0; background: none; border: 0; outline: none;
+  font-size: 1.05rem; padding: 14px 0; color: var(--fg);
+}
+.search-box input::placeholder { color: var(--fg-muted); }
+.search-box input::-webkit-search-cancel-button { display: none; }
+
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: 0;
+  background: var(--bg-3); color: var(--fg); font-size: 1.4rem; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+.results {
+  list-style: none; margin: 8px 0 0; padding: 6px;
+  background: var(--bg-2); border: 1.5px solid var(--line); border-radius: var(--radius);
+  position: absolute; left: 0; right: 0; z-index: 20;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  max-height: min(60dvh, 420px); overflow-y: auto;
+}
+.results li {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 10px; row-gap: 2px;
+  padding: 12px 12px; border-radius: var(--radius-sm);
+  min-height: 56px; cursor: pointer;
+}
+.results li[aria-selected="true"], .results li:hover { background: var(--bg-3); }
+.results .r-title { font-weight: 700; font-size: 1.05rem; min-width: 0; overflow-wrap: anywhere; }
+.results .r-title mark { background: none; color: var(--accent); }
+.results .r-sub { grid-column: 1 / -1; color: var(--fg-muted); font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.results .r-tag {
+  justify-self: end; white-space: nowrap;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 4px 8px; border-radius: 999px; background: var(--bg-3); color: var(--fg-muted);
+}
+.results .r-tag.brand { background: rgba(216, 245, 106, 0.14); color: var(--accent); }
+
+.hint { color: var(--fg-muted); font-size: 0.9rem; margin-top: 10px; padding: 0 4px; }
+
+/* --------------------------------------------------------------------------
+   Tu tratamiento
+   -------------------------------------------------------------------------- */
+.treatment { margin-top: 28px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px 10px; }
+.section-head h2 { font-size: 1.05rem; font-weight: 700; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.count { color: var(--fg-muted); font-size: 0.9rem; }
+
+.med-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.med-list li {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg-2); border: 1.5px solid var(--line); border-radius: var(--radius);
+  padding: 12px 8px 12px 16px;
+}
+.med-list .m-main { flex: 1; min-width: 0; }
+.med-list .m-title { font-weight: 800; font-size: 1.15rem; text-transform: capitalize; }
+.med-list .m-sub { color: var(--fg-muted); font-size: 0.92rem; margin-top: 2px; }
+.med-list .m-remove {
+  flex: none; width: var(--tap); height: var(--tap); border-radius: 50%; border: 0;
+  background: none; color: var(--fg-muted); font-size: 1.6rem; line-height: 1;
+}
+.med-list .m-remove:hover, .med-list .m-remove:focus-visible { background: var(--bg-3); color: var(--danger); }
+
+.empty {
+  text-align: center; color: var(--fg-muted); padding: 28px 16px;
+  border: 1.5px dashed var(--line); border-radius: var(--radius);
+}
+.empty p + p { margin-top: 6px; }
+
+.privacy {
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+  color: var(--fg-muted); font-size: 0.85rem; margin-top: 22px; text-align: center;
+}
+.privacy svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; }
+
+/* --------------------------------------------------------------------------
+   Botones y CTA fijo
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 56px; padding: 0 20px; border-radius: var(--radius);
+  border: 1.5px solid transparent; font-weight: 800; font-size: 1.1rem;
+  text-decoration: none; width: 100%;
+}
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-ghost { background: transparent; border-color: var(--line); color: var(--fg); font-weight: 600; font-size: 1rem; }
+.btn-ghost:hover { background: var(--bg-2); }
+.badge {
+  font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 3px 7px; border-radius: 999px; background: var(--bg-3); color: var(--fg-muted);
+}
+.link-btn { background: none; border: 0; color: var(--fg-muted); text-decoration: underline; padding: 12px; font-size: 0.92rem; }
+
+.cta-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  padding: 12px 16px calc(12px + var(--safe-b));
+  background: linear-gradient(to top, var(--bg) 70%, rgba(11, 31, 23, 0));
+}
+.cta-bar > * { max-width: 560px; margin-left: auto; margin-right: auto; display: flex; }
+.cta-hint { color: var(--fg-muted); font-size: 0.9rem; justify-content: center; margin-bottom: 8px; }
+
+/* --------------------------------------------------------------------------
+   Ficha del fármaco
+   -------------------------------------------------------------------------- */
+.label { color: var(--fg-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+.drug-head { padding: 8px 0 4px; }
+.drug-title {
+  font-size: clamp(2.1rem, 9vw, 2.8rem); font-weight: 900; letter-spacing: -0.02em; line-height: 1.05;
+  text-transform: capitalize; margin-top: 8px; overflow-wrap: anywhere;
+}
+.drug-inn { font-size: 1.15rem; margin-top: 6px; }
+.drug-inn span:first-child { color: var(--accent); font-weight: 700; }
+.atc { font-size: 0.85rem; margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+.alerts { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+.alert {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: var(--warn-bg); color: var(--warn-ink);
+  border-left: 5px solid var(--warn-line); border-radius: var(--radius-sm);
+  padding: 12px 14px; font-weight: 600; font-size: 1rem;
+}
+.alert svg { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; margin-top: 1px; }
+
+.chooser { margin-top: 24px; }
+.chooser-title { font-size: 0.9rem; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; margin-bottom: 10px; }
+.pills { display: flex; flex-wrap: wrap; gap: 10px; }
+.pill {
+  min-height: var(--tap); padding: 0 18px; border-radius: 999px;
+  border: 1.5px solid var(--line); background: var(--bg-2); color: var(--fg);
+  font-weight: 700; font-size: 1.05rem;
+}
+.pill[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.pill:focus-visible { outline: 3px solid rgba(216, 245, 106, 0.5); outline-offset: 2px; }
+
+.brands-help { margin-top: 26px; font-size: 0.9rem; padding: 0 2px; }
+
+/* --------------------------------------------------------------------------
+   Pase (vista farmacéutico) · tarjeta clara tipo boarding pass
+   -------------------------------------------------------------------------- */
+.view-pass { padding: calc(8px + var(--safe-t)) 10px calc(24px + var(--safe-b)); max-width: 600px; }
+
+.pass-toolbar { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 4px 6px; }
+.pass-toolbar-spacer { flex: 1; }
+.country { display: inline-flex; align-items: center; gap: 8px; color: var(--fg-muted); font-size: 0.9rem; }
+.country select {
+  background: var(--bg-2); border: 1.5px solid var(--line); border-radius: 999px;
+  padding: 8px 12px; min-height: 40px; color: var(--fg); font-weight: 700;
+}
+
+.pass-card {
+  background: var(--card-bg); color: var(--card-ink);
+  border-radius: 22px; padding: 22px 20px 18px;
+  min-height: calc(100dvh - 190px);
+  display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  position: relative;
+}
+.pass-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding-bottom: 14px; border-bottom: 2px solid var(--card-ink); }
+.pass-kicker { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--card-muted); }
+.pass-title { font-size: 1.05rem; font-weight: 800; margin-top: 4px; letter-spacing: -0.01em; }
+.pass-who { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-align: right; color: var(--card-muted); line-height: 1.2; padding-top: 2px; }
+
+.pass-list { list-style: none; margin: 0; padding: 0; flex: 1; }
+.pass-list li { padding: 16px 0 14px; border-bottom: 1px solid var(--card-line); }
+.pass-list li:last-child { border-bottom: 0; }
+.p-inn-es {
+  font-size: clamp(28px, 7.8vw, 34px); font-weight: 900; line-height: 1.05; letter-spacing: -0.02em;
+  text-transform: uppercase; overflow-wrap: anywhere;
+}
+.p-inn-es.unknown { text-transform: none; color: var(--card-muted); }
+.p-line { margin-top: 6px; font-size: 1.15rem; font-weight: 600; color: var(--card-ink); display: flex; flex-wrap: wrap; gap: 0 8px; align-items: baseline; }
+.p-line .p-inn { font-weight: 800; }
+.p-line .p-sep { color: var(--card-muted); font-weight: 400; }
+.p-brands { margin-top: 6px; font-size: 0.92rem; color: var(--card-muted); }
+.p-brands b { color: var(--card-ink); font-weight: 700; }
+.p-alert {
+  display: flex; gap: 8px; align-items: flex-start;
+  margin-top: 8px; padding: 8px 10px; border-radius: 8px;
+  background: var(--warn-bg); color: var(--warn-ink); font-size: 0.92rem; font-weight: 600;
+  border-left: 4px solid var(--warn-line);
+}
+.p-alert svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; margin-top: 1px; }
+.pass-empty { padding: 32px 0; color: var(--card-muted); text-align: center; font-weight: 600; }
+
+/* línea de corte tipo boarding pass */
+.pass-tear { position: relative; height: 0; border-top: 2px dashed var(--card-line); margin: 10px -20px 18px; }
+.pass-tear::before, .pass-tear::after {
+  content: ""; position: absolute; top: -13px; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--bg);
+}
+.pass-tear::before { left: -13px; }
+.pass-tear::after { right: -13px; }
+
+.pass-qr { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.qr { width: min(62vw, 240px); aspect-ratio: 1; background: #fff; border-radius: 12px; padding: 6px; }
+.qr svg, .qr img { width: 100%; height: 100%; display: block; }
+.qr-caption { font-size: 0.85rem; color: var(--card-muted); }
+
+.pass-foot { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--card-line); text-align: center; }
+.pass-foot-main { font-weight: 800; font-size: 0.98rem; }
+.pass-foot-sub { font-size: 0.78rem; color: var(--card-muted); margin-top: 4px; }
+
+.pass-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; padding: 0 4px; }
+.pass-actions-row { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.pass-actions-row .btn { min-height: 52px; white-space: nowrap; }
+.btn-wallet { color: var(--fg-muted); }
+
+@media (min-width: 480px) {
+  .pass-actions-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* --------------------------------------------------------------------------
+   Carga, diálogo, toast
+   -------------------------------------------------------------------------- */
+.boot { position: fixed; inset: 0; display: grid; place-items: center; background: var(--bg); color: var(--fg-muted); z-index: 50; padding: 24px; text-align: center; }
+.boot.error { color: var(--danger); }
+
+.dialog {
+  border: 0; border-radius: 20px; padding: 22px 20px calc(20px + var(--safe-b));
+  background: var(--bg-2); color: var(--fg); width: min(92vw, 440px);
+  max-height: 85dvh;
+}
+.dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+.dialog h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 12px; }
+.dialog ol { margin: 0 0 14px; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+.dialog h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-muted); margin: 14px 0 6px; }
+.dialog .btn { margin-top: 12px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(24px + var(--safe-b)); transform: translateX(-50%) translateY(20px);
+  background: var(--accent); color: var(--accent-ink); font-weight: 800;
+  padding: 12px 18px; border-radius: 999px; opacity: 0; pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s; z-index: 60; max-width: 90vw; text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (min-width: 640px) {
+  .pass-card { min-height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
